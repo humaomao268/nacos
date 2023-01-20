@@ -55,10 +55,10 @@ public class UnhealthyInstanceChecker implements InstanceBeatChecker {
 
     /**
      *
-     *  距离上次心跳时间已经超过超时时间
+     *  <p>距离上次心跳时间已经超过超时时间.</p>
      *
-     * @param service
-     * @param instance
+     * @param service 服务
+     * @param instance 实例
      * @return
      */
     private boolean isUnhealthy(Service service, HealthCheckInstancePublishInfo instance) {

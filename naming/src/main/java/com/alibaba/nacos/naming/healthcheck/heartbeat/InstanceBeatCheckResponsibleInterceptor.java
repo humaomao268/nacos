@@ -29,7 +29,7 @@ public class InstanceBeatCheckResponsibleInterceptor extends AbstractBeatCheckIn
 
     /**
      *
-     * 判断心跳检查任务是否由该服务器负责
+     * <p>判断心跳检查任务是否由该服务器负责.</p>
      *
      * @param object need intercepted object
      * @return

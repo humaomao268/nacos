@@ -34,7 +34,7 @@ public class InstanceEnableBeatCheckInterceptor extends AbstractBeatCheckInterce
 
     /**
      *
-     * 判断实例的元数据是否启用了心跳检查
+     * <p>判断实例的元数据是否启用了心跳检查.</p>
      *
      * @param object need intercepted object
      * @return

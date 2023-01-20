@@ -32,7 +32,7 @@ public class ServiceEnableBeatCheckInterceptor extends AbstractBeatCheckIntercep
 
     /**
      *
-     * 判断服务是否启动了客户端心跳
+     * <p>判断服务是否启动了客户端心跳.</p>
      *
      * @param object need intercepted object
      * @return
