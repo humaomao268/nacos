@@ -112,7 +112,7 @@ public class InstanceController {
                 .setDefaultInstanceEphemeral(switchDomain.isDefaultInstanceEphemeral()).setRequest(request).build();
         // 注册实例
         getInstanceOperator().registerInstance(namespaceId, serviceName, instance);
-        // 发布事件
+        // 发布RegisterInstanceTraceEvent事件
         NotifyCenter.publishEvent(new RegisterInstanceTraceEvent(System.currentTimeMillis(), "", false, namespaceId,
                 NamingUtils.getGroupName(serviceName), NamingUtils.getServiceName(serviceName), instance.getIp(),
                 instance.getPort()));

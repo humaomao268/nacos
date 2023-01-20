@@ -53,6 +53,7 @@ public class ClientOperationServiceProxy implements ClientOperationService {
     
     @Override
     public void registerInstance(Service service, Instance instance, String clientId) throws NacosException {
+        // 选择合适的客户端操作类
         final ClientOperationService operationService = chooseClientOperationService(instance);
         operationService.registerInstance(service, instance, clientId);
     }
@@ -86,6 +87,7 @@ public class ClientOperationServiceProxy implements ClientOperationService {
     }
     
     private ClientOperationService chooseClientOperationService(final Instance instance) {
+        // true: EphemeralClientOperationServiceImpl, false: PersistentClientOperationServiceImpl
         return instance.isEphemeral() ? ephemeralClientOperationService : persistentClientOperationService;
     }
 }
