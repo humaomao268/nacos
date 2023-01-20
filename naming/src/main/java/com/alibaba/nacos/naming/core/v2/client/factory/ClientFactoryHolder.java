@@ -37,12 +37,14 @@ public class ClientFactoryHolder {
     
     private ClientFactoryHolder() {
         clientFactories = new HashMap<>(4);
+        // 加载ClientFactory实现类
         Collection<ClientFactory> clientFactories = NacosServiceLoader.load(ClientFactory.class);
         for (ClientFactory each : clientFactories) {
             if (this.clientFactories.containsKey(each.getType())) {
                 Loggers.SRV_LOG.warn("Client type {} found multiple factory, use {} default", each.getType(),
                         each.getClass().getCanonicalName());
             }
+            // key: client类型  value: client类型对应的工厂类
             this.clientFactories.put(each.getType(), each);
         }
     }
@@ -58,6 +60,7 @@ public class ClientFactoryHolder {
      * @return target type {@link ClientFactory}, if not fount, return 'default' client factory.
      */
     public ClientFactory findClientFactory(String type) {
+        // 根据client类型从map获取相应的工厂类
         if (StringUtils.isEmpty(type) || !clientFactories.containsKey(type)) {
             return clientFactories.get(ClientConstants.DEFAULT_FACTORY);
         }

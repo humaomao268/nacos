@@ -107,11 +107,12 @@ public class InstanceController {
         final String serviceName = WebUtils.required(request, CommonParams.SERVICE_NAME);
         // 校验服务名是否合法
         NamingUtils.checkServiceNameFormat(serviceName);
-        
+        // 根据请求参数创建实例
         final Instance instance = HttpRequestInstanceBuilder.newBuilder()
                 .setDefaultInstanceEphemeral(switchDomain.isDefaultInstanceEphemeral()).setRequest(request).build();
-        
+        // 注册实例
         getInstanceOperator().registerInstance(namespaceId, serviceName, instance);
+        // 发布事件
         NotifyCenter.publishEvent(new RegisterInstanceTraceEvent(System.currentTimeMillis(), "", false, namespaceId,
                 NamingUtils.getGroupName(serviceName), NamingUtils.getServiceName(serviceName), instance.getIp(),
                 instance.getPort()));

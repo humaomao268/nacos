@@ -133,6 +133,7 @@ public class IpPortBasedClient extends AbstractClient {
     public void init() {
         if (ephemeral) {
             beatCheckTask = new ClientBeatCheckTaskV2(this);
+            // 放入定时任务管理器(5s执行一次)
             HealthCheckReactor.scheduleCheck(beatCheckTask);
         } else {
             healthCheckTaskV2 = new HealthCheckTaskV2(this);
