@@ -105,6 +105,7 @@ public class InstanceController {
         final String namespaceId = WebUtils
                 .optional(request, CommonParams.NAMESPACE_ID, Constants.DEFAULT_NAMESPACE_ID);
         final String serviceName = WebUtils.required(request, CommonParams.SERVICE_NAME);
+        // 校验服务名是否合法
         NamingUtils.checkServiceNameFormat(serviceName);
         
         final Instance instance = HttpRequestInstanceBuilder.newBuilder()

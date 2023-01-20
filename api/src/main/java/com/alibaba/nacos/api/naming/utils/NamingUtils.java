@@ -99,6 +99,7 @@ public class NamingUtils {
      * @param combineServiceName such as: groupName@@serviceName
      */
     public static void checkServiceNameFormat(String combineServiceName) {
+        // 格式要求 groupName@@serviceName
         String[] split = combineServiceName.split(Constants.SERVICE_INFO_SPLITER);
         if (split.length <= 1) {
             throw new IllegalArgumentException(
