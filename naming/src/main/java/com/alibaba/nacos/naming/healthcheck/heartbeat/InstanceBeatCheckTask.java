@@ -39,10 +39,15 @@ public class InstanceBeatCheckTask implements Interceptable {
     private final Service service;
     
     private final HealthCheckInstancePublishInfo instancePublishInfo;
-    
+
+    // 心跳检查列表
     static {
+        // 不健康实例检查
         CHECKERS.add(new UnhealthyInstanceChecker());
+        // 过期实例检查
         CHECKERS.add(new ExpiredInstanceChecker());
+        // 使用Java spi扩展机制用户可以在META-INF/services下
+        // 创建InstanceBeatChecker的实现类实现用户自定义扩展
         CHECKERS.addAll(NacosServiceLoader.load(InstanceBeatChecker.class));
     }
     
@@ -54,6 +59,7 @@ public class InstanceBeatCheckTask implements Interceptable {
     
     @Override
     public void passIntercept() {
+        // 任务上的拦截器逐个执行
         for (InstanceBeatChecker each : CHECKERS) {
             each.doCheck(client, service, instancePublishInfo);
         }

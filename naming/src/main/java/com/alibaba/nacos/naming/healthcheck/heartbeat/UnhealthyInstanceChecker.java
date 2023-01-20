@@ -46,11 +46,21 @@ public class UnhealthyInstanceChecker implements InstanceBeatChecker {
     
     @Override
     public void doCheck(Client client, Service service, HealthCheckInstancePublishInfo instance) {
+        // 原来是健康现在不健康的条件判断
         if (instance.isHealthy() && isUnhealthy(service, instance)) {
+            // 更新健康状态
             changeHealthyStatus(client, service, instance);
         }
     }
-    
+
+    /**
+     *
+     *  距离上次心跳时间已经超过超时时间
+     *
+     * @param service
+     * @param instance
+     * @return
+     */
     private boolean isUnhealthy(Service service, HealthCheckInstancePublishInfo instance) {
         long beatTimeout = getTimeout(service, instance);
         return System.currentTimeMillis() - instance.getLastHeartBeatTime() > beatTimeout;
@@ -71,13 +81,17 @@ public class UnhealthyInstanceChecker implements InstanceBeatChecker {
     }
     
     private void changeHealthyStatus(Client client, Service service, HealthCheckInstancePublishInfo instance) {
+        // 实例健康状态设置为false
         instance.setHealthy(false);
         Loggers.EVT_LOG
                 .info("{POS} {IP-DISABLED} valid: {}:{}@{}@{}, region: {}, msg: client last beat: {}", instance.getIp(),
                         instance.getPort(), instance.getCluster(), service.getName(), UtilsAndCommons.LOCALHOST_SITE,
                         instance.getLastHeartBeatTime());
+        // 发布服务变更事件
         NotifyCenter.publishEvent(new ServiceEvent.ServiceChangedEvent(service));
+        // 发布客户端变更事件
         NotifyCenter.publishEvent(new ClientEvent.ClientChangedEvent(client));
+        // 发布健康状态变更跟踪事件
         NotifyCenter.publishEvent(new HealthStateChangeTraceEvent(System.currentTimeMillis(),
                 service.getNamespace(), service.getGroup(), service.getName(), instance.getIp(), instance.getPort(),
                 false, "client_beat"));

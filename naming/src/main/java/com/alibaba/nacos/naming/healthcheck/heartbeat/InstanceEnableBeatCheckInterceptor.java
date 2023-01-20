@@ -31,7 +31,14 @@ import java.util.Optional;
  * @author xiweng.yy
  */
 public class InstanceEnableBeatCheckInterceptor extends AbstractBeatCheckInterceptor {
-    
+
+    /**
+     *
+     * 判断实例的元数据是否启用了心跳检查
+     *
+     * @param object need intercepted object
+     * @return
+     */
     @Override
     public boolean intercept(InstanceBeatCheckTask object) {
         NamingMetadataManager metadataManager = ApplicationUtils.getBean(NamingMetadataManager.class);

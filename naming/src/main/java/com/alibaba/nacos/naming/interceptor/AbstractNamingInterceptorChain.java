@@ -34,6 +34,7 @@ public abstract class AbstractNamingInterceptorChain<T extends Interceptable>
     
     protected AbstractNamingInterceptorChain(Class<? extends NacosNamingInterceptor<T>> clazz) {
         this.interceptors = new LinkedList<>();
+        // spi机制加载用户自定义的拦截器,实现AbstractHealthCheckInterceptor
         interceptors.addAll(NacosServiceLoader.load(clazz));
         interceptors.sort(Comparator.comparingInt(NacosNamingInterceptor::order));
     }
@@ -56,14 +57,18 @@ public abstract class AbstractNamingInterceptorChain<T extends Interceptable>
     @Override
     public void doInterceptor(T object) {
         for (NacosNamingInterceptor<T> each : interceptors) {
+            // 校验拦截器是否支持拦截该对象
             if (!each.isInterceptType(object.getClass())) {
                 continue;
             }
+            // 拦截器执行
             if (each.intercept(object)) {
+                // 拦截器成功返回后执行对象的afterIntercept方法
                 object.afterIntercept();
                 return;
             }
         }
+        // 执行对象的通过拦截方法
         object.passIntercept();
     }
 }
