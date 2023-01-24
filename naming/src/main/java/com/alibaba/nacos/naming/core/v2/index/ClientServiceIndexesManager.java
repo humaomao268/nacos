@@ -45,23 +45,23 @@ import java.util.concurrent.ConcurrentMap;
  */
 @Component
 public class ClientServiceIndexesManager extends SmartSubscriber {
-    
+    // 服务的所有发布者列表
     private final ConcurrentMap<Service, Set<String>> publisherIndexes = new ConcurrentHashMap<>();
-    
+    // 服务的所有订阅者列表
     private final ConcurrentMap<Service, Set<String>> subscriberIndexes = new ConcurrentHashMap<>();
     
     public ClientServiceIndexesManager() {
         NotifyCenter.registerSubscriber(this, NamingEventPublisherFactory.getInstance());
     }
-    
+    // 得到某个服务的所有注册客户端
     public Collection<String> getAllClientsRegisteredService(Service service) {
         return publisherIndexes.containsKey(service) ? publisherIndexes.get(service) : new ConcurrentHashSet<>();
     }
-    
+    // 得到某个服务的所有订阅者客户端
     public Collection<String> getAllClientsSubscribeService(Service service) {
         return subscriberIndexes.containsKey(service) ? subscriberIndexes.get(service) : new ConcurrentHashSet<>();
     }
-    
+    // 所有订阅的服务
     public Collection<Service> getSubscribedService() {
         return subscriberIndexes.keySet();
     }
@@ -76,7 +76,13 @@ public class ClientServiceIndexesManager extends SmartSubscriber {
             publisherIndexes.remove(service);
         }
     }
-    
+
+    /**
+     *
+     * <p>该订阅器订阅那些类型的事件.</p>
+     *
+     * @return
+     */
     @Override
     public List<Class<? extends Event>> subscribeTypes() {
         List<Class<? extends Event>> result = new LinkedList<>();
@@ -87,7 +93,14 @@ public class ClientServiceIndexesManager extends SmartSubscriber {
         result.add(ClientEvent.ClientDisconnectEvent.class);
         return result;
     }
-    
+
+    /**
+     *
+     * <p>事件分2类.</p>
+     * <p>上线、下线、订阅、取消订阅 属于ClientOperationEvent.</p>
+     *
+     * @param event {@link Event}
+     */
     @Override
     public void onEvent(Event event) {
         if (event instanceof ClientEvent.ClientDisconnectEvent) {
@@ -96,7 +109,13 @@ public class ClientServiceIndexesManager extends SmartSubscriber {
             handleClientOperation((ClientOperationEvent) event);
         }
     }
-    
+
+    /**
+     *
+     * <p>客户端下线事件的处理.</p>
+     *
+     * @param event {@link Event}
+     */
     private void handleClientDisconnect(ClientEvent.ClientDisconnectEvent event) {
         Client client = event.getClient();
         for (Service each : client.getAllSubscribeService()) {
@@ -118,12 +137,16 @@ public class ClientServiceIndexesManager extends SmartSubscriber {
         Service service = event.getService();
         String clientId = event.getClientId();
         if (event instanceof ClientOperationEvent.ClientRegisterServiceEvent) {
+            // 服务注册
             addPublisherIndexes(service, clientId);
         } else if (event instanceof ClientOperationEvent.ClientDeregisterServiceEvent) {
+            // 服务下线
             removePublisherIndexes(service, clientId);
         } else if (event instanceof ClientOperationEvent.ClientSubscribeServiceEvent) {
+            // 服务订阅
             addSubscriberIndexes(service, clientId);
         } else if (event instanceof ClientOperationEvent.ClientUnsubscribeServiceEvent) {
+            // 取消订阅
             removeSubscriberIndexes(service, clientId);
         }
     }
@@ -133,7 +156,14 @@ public class ClientServiceIndexesManager extends SmartSubscriber {
         publisherIndexes.get(service).add(clientId);
         NotifyCenter.publishEvent(new ServiceEvent.ServiceChangedEvent(service, true));
     }
-    
+
+    /**
+     *
+     * <p>从发布服务列表中移除该服务的该clientId.</p>
+     *
+     * @param service 服务
+     * @param clientId 客户端id
+     */
     private void removePublisherIndexes(Service service, String clientId) {
         publisherIndexes.computeIfPresent(service, (s, ids) -> {
             ids.remove(clientId);
@@ -149,11 +179,19 @@ public class ClientServiceIndexesManager extends SmartSubscriber {
             NotifyCenter.publishEvent(new ServiceEvent.ServiceSubscribedEvent(service, clientId));
         }
     }
-    
+
+    /**
+     *
+     * <p>从该服务的订阅者列表中移除该clientId.</p>
+     *
+     * @param service 服务
+     * @param clientId 客户端id
+     */
     private void removeSubscriberIndexes(Service service, String clientId) {
         if (!subscriberIndexes.containsKey(service)) {
             return;
         }
+        // 某个服务没有订阅者是key也一并删除掉
         subscriberIndexes.get(service).remove(clientId);
         if (subscriberIndexes.get(service).isEmpty()) {
             subscriberIndexes.remove(service);

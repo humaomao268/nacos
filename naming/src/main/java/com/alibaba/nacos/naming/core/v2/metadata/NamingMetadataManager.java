@@ -42,15 +42,20 @@ import java.util.concurrent.ConcurrentMap;
  */
 @Component
 public class NamingMetadataManager extends SmartSubscriber {
-    
+    // 存放过期的
     private final Set<ExpiredMetadataInfo> expiredMetadataInfos;
     
     private ConcurrentMap<Service, ServiceMetadata> serviceMetadataMap;
-    
+    // 以service为key,嵌套Map中以instance的metaDataId为key
     private ConcurrentMap<Service, ConcurrentMap<String, InstanceMetadata>> instanceMetadataMap;
     
     private static final int INITIAL_CAPACITY = 1;
-    
+
+    /**
+     *
+     * <p>该订阅只支持3种事件类型：实例元数据变更事件、服务的元数据变更事件、客户端断连事件.</p>
+     *
+     */
     public NamingMetadataManager() {
         serviceMetadataMap = new ConcurrentHashMap<>(1 << 10);
         instanceMetadataMap = new ConcurrentHashMap<>(1 << 10);
@@ -220,7 +225,13 @@ public class NamingMetadataManager extends SmartSubscriber {
         result.add(ClientEvent.ClientDisconnectEvent.class);
         return result;
     }
-    
+
+    /**
+     *
+     * <p>3类事件的处理入口.</p>
+     *
+     * @param event 事件
+     */
     @Override
     public void onEvent(Event event) {
         if (event instanceof MetadataEvent.InstanceMetadataEvent) {

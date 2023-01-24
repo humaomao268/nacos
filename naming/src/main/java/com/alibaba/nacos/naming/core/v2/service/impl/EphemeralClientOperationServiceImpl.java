@@ -72,9 +72,9 @@ public class EphemeralClientOperationServiceImpl implements ClientOperationServi
         client.addServiceInstance(singleton, instanceInfo);
         client.setLastUpdatedTime();
         client.recalculateRevision();
-        // 发布ClientRegisterServiceEvent事件
+        // 注册完成发布ClientRegisterServiceEvent事件
         NotifyCenter.publishEvent(new ClientOperationEvent.ClientRegisterServiceEvent(singleton, clientId));
-        // 发布InstanceMetadataEvent事件
+        // 注册完成发布InstanceMetadataEvent事件
         NotifyCenter
                 .publishEvent(new MetadataEvent.InstanceMetadataEvent(singleton, instanceInfo.getMetadataId(), false));
     }
